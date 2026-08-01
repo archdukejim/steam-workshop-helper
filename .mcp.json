@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "steam-workshop-helper": {
+      "command": "node",
+      "args": [
+        "C:\\github\\archdukejim\\steam-workshop-helper\\mcp\\server\\build\\index.js"
+      ],
+      "env": {
+        "SWH_MCP_PORT": "8766"
+      }
+    }
+  }
+}

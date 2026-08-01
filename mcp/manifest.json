@@ -1,0 +1,52 @@
+{
+  "manifest_version": "0.3",
+  "name": "steam-workshop-helper-mcp",
+  "display_name": "Steam Workshop Helper MCP",
+  "version": "0.1.0",
+  "description": "Local MCP server for managing Steam Workshop comments and item descriptions via the Steam Workshop Helper Chrome extension.",
+  "long_description": "Exposes the Steam Workshop Helper extension's window.SWH API as MCP tools: read Steam login state, list/post/delete workshop comments, and read/update item titles and descriptions. The server runs locally and reaches the extension over a 127.0.0.1 loopback bridge — it never talks to the network and holds no Steam credentials of its own; all actions run against the logged-in Steam session in the browser. Requires the Steam Workshop Helper Chrome extension to be installed and a steamcommunity.com tab open.",
+  "author": {
+    "name": "archdukejim"
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/index.js"
+      ],
+      "env": {
+        "SWH_MCP_PORT": "${user_config.bridge_port}"
+      }
+    }
+  },
+  "tools": [
+    { "name": "swh_open_item", "description": "Open/focus a browser tab directly on a workshop item (works logged in or not)." },
+    { "name": "swh_get_auth", "description": "Report Steam login state as seen by the browser." },
+    { "name": "swh_get_context", "description": "Metadata about the workshop item open in the active tab." },
+    { "name": "swh_list_comments", "description": "List comments on a workshop item." },
+    { "name": "swh_post_comment", "description": "Post a comment on a workshop item (BBCode)." },
+    { "name": "swh_delete_comment", "description": "Delete a comment by its gidcomment id." },
+    { "name": "swh_get_item", "description": "Read a workshop item's editable title/description/visibility." },
+    { "name": "swh_update_description", "description": "Replace a workshop item's full description (BBCode)." },
+    { "name": "swh_update_title", "description": "Update a workshop item's title." }
+  ],
+  "keywords": ["steam", "workshop", "rimworld", "mcp", "modding"],
+  "license": "MIT",
+  "user_config": {
+    "bridge_port": {
+      "type": "string",
+      "title": "Loopback Bridge Port",
+      "description": "TCP port on 127.0.0.1 the extension connects to. Must match the port in the extension's manifest host_permissions (default 8766).",
+      "required": false,
+      "default": "8766"
+    }
+  },
+  "compatibility": {
+    "platforms": ["win32", "darwin", "linux"],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  }
+}

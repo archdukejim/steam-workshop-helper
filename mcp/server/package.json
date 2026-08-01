@@ -1,0 +1,21 @@
+{
+  "name": "steam-workshop-helper-mcp",
+  "version": "0.1.0",
+  "description": "Local MCP server for the Steam Workshop Helper Chrome extension — manage workshop comments and item descriptions via window.SWH over a loopback bridge.",
+  "main": "build/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js"
+  },
+  "keywords": ["mcp", "steam", "workshop", "rimworld"],
+  "author": "archdukejim",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
