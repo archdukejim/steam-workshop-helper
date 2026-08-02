@@ -4,7 +4,13 @@
     "3775191933": { "owner": "archdukejim", "repo": "dynamic-walk-speed", "title": "Dynamic Walk Speeds" },
     "3775179446": { "owner": "archdukejim", "repo": "rimworld-performance-custom-maps", "title": "Performance Custom Maps" },
     "3775176411": { "owner": "archdukejim", "repo": "rimworld-room-auto-light", "title": "Room Auto Light" },
+    "3768365293": { "owner": "RimSynapse", "repo": "WorldNews", "title": "RimSynapse - WorldNews" },
+    "3768364958": { "owner": "RimSynapse", "repo": "AuraAlgorithm", "title": "RimSynapse - Aura Algorithm" },
+    "3768364266": { "owner": "RimSynapse", "repo": "Regions-and-Territories", "title": "RimSynapse - Regions and Territories" },
+    "3768363934": { "owner": "RimSynapse", "repo": "Conversations", "title": "RimSynapse - Conversations" },
+    "3767279097": { "owner": "RimSynapse", "repo": "Factions", "title": "RimSynapse - Factions" },
+    "3760830285": { "owner": "RimSynapse", "repo": "NVIDIA-Tool", "title": "RimSynapse - NVIDIA Tool" },
     "3760830041": { "owner": "RimSynapse", "repo": "Psychology", "title": "RimSynapse - Psychology" },
-    "3768364266": { "owner": "RimSynapse", "repo": "Regions-and-Territories", "title": "RimSynapse - Regions and Territories" }
+    "3760829776": { "owner": "RimSynapse", "repo": "Core", "title": "RimSynapse - Core" }
   }
 }
