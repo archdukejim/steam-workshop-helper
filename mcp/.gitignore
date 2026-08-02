@@ -1,0 +1,4 @@
+github_token.txt
+*.mcpb
+mcp-config/triage-report.json
+harness/triage-last-run.log

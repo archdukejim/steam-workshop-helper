@@ -8,6 +8,7 @@ import {
 import { loadConfig } from "./config";
 import { startBridge, Bridge } from "./bridge";
 import { swhTools, handleSwhTool } from "./tools/workshop";
+import { githubTools, handleGithubTool } from "./tools/github";
 
 // 1. Config
 const config = loadConfig();
@@ -23,7 +24,7 @@ const server = new Server(
   }
 );
 
-const ALL_TOOLS = [...swhTools];
+const ALL_TOOLS = [...swhTools, ...githubTools];
 
 let bridge: Bridge | null = null;
 
@@ -35,11 +36,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params as any;
 
-  if (!bridge) {
-    throw new Error("Loopback bridge not started yet.");
+  // GitHub tools talk to the API directly and don't need the browser bridge.
+  if (githubTools.some((t) => t.name === name)) {
+    return await handleGithubTool(name, args);
   }
 
   if (swhTools.some((t) => t.name === name)) {
+    if (!bridge) throw new Error("Loopback bridge not started yet.");
     return await handleSwhTool(name, args, bridge);
   }
 

@@ -25,12 +25,17 @@
     { "name": "swh_open_item", "description": "Open/focus a browser tab directly on a workshop item (works logged in or not)." },
     { "name": "swh_get_auth", "description": "Report Steam login state as seen by the browser." },
     { "name": "swh_get_context", "description": "Metadata about the workshop item open in the active tab." },
+    { "name": "swh_review_notifications", "description": "Review recent comment notifications across all your items, enriched with comment text." },
+    { "name": "swh_get_notifications", "description": "Raw list of items with new comment activity (no comment text)." },
     { "name": "swh_list_comments", "description": "List comments on a workshop item." },
     { "name": "swh_post_comment", "description": "Post a comment on a workshop item (BBCode)." },
     { "name": "swh_delete_comment", "description": "Delete a comment by its gidcomment id." },
     { "name": "swh_get_item", "description": "Read a workshop item's editable title/description/visibility." },
     { "name": "swh_update_description", "description": "Replace a workshop item's full description (BBCode)." },
-    { "name": "swh_update_title", "description": "Update a workshop item's title." }
+    { "name": "swh_update_title", "description": "Update a workshop item's title." },
+    { "name": "swh_repo_for_item", "description": "Resolve which GitHub repo a workshop item's issues belong to." },
+    { "name": "swh_find_issue", "description": "Search a repo's issues to avoid filing duplicates." },
+    { "name": "swh_create_issue", "description": "Create a GitHub issue for a triaged comment." }
   ],
   "keywords": ["steam", "workshop", "rimworld", "mcp", "modding"],
   "license": "MIT",

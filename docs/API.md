@@ -94,6 +94,43 @@ the comment **or** the item. Returns `{ ok: true, total: <remaining> }`.
 
 ---
 
+## Comment notifications
+
+Aggregates comment activity across **all** your workshop items from Steam's
+Comment Notifications feed. That feed lists *which* items have new comments but
+not the text, so `reviewNotifications` enriches each with its latest comments.
+
+### `SWH.getNotifications()`
+Raw list — fast, no comment text.
+
+```js
+{ count: 6, notifications: [
+  { fileId: "3775176411", title: "Room Auto Light", description: "Your RimWorld Workshop Item",
+    newPosts: null, dateText: "10 hours ago", isOwnItem: true }
+] }
+```
+
+### `SWH.reviewNotifications({ ownItemsOnly?, perItem? })`
+The "review my recent notifications" digest. `ownItemsOnly` defaults `true`
+(your items only); `perItem` defaults `5`.
+
+```js
+{
+  itemCount: 4,
+  items: [
+    { fileId: "3760830041", title: "RimSynapse - Psychology", dateText: "Jul 26 @ 11:10pm",
+      newPosts: null, url: "https://steamcommunity.com/sharedfiles/filedetails/?id=3760830041",
+      latestComments: [ { id, author: "Bradybeast13", authorId, timestamp, text } ] }
+  ],
+  skipped: [ { title: "This item was moved or deleted.", dateText, note } ]
+}
+```
+
+Rows Steam can't resolve to an item (moved/deleted) are returned under `skipped`
+rather than dropped silently.
+
+---
+
 ## Title & description
 
 These clone the item's real edit form (the `ItemEditText` form at

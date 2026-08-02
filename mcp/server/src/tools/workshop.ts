@@ -47,6 +47,30 @@ export const swhTools = [
     inputSchema: { type: "object", properties: {} },
   },
   {
+    name: "swh_review_notifications",
+    description:
+      "Review recent comment notifications across ALL your workshop items in one call. Reads Steam's Comment Notifications feed (items people commented on) and enriches each with its latest comments (author, timestamp, text). This is the 'review my recent notifications' digest.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        ownItemsOnly: {
+          type: "boolean",
+          description: "Only your own items, excluding subscribed discussions (default true).",
+        },
+        perItem: {
+          type: "number",
+          description: "How many latest comments to include per item (default 5).",
+        },
+      },
+    },
+  },
+  {
+    name: "swh_get_notifications",
+    description:
+      "Raw comment-notifications list (which items have new comment activity), without fetching the comment text. Faster than swh_review_notifications; use it for just the summary.",
+    inputSchema: { type: "object", properties: {} },
+  },
+  {
     name: "swh_list_comments",
     description:
       "List comments on a workshop item. Returns { total, comments: [{ id, author, authorId, timestamp, text }] }. `id` is the gidcomment used by swh_delete_comment.",
@@ -129,6 +153,8 @@ const METHOD_MAP: Record<string, string> = {
   swh_open_item: "openItem",
   swh_get_auth: "getAuth",
   swh_get_context: "getContext",
+  swh_review_notifications: "reviewNotifications",
+  swh_get_notifications: "getNotifications",
   swh_list_comments: "listComments",
   swh_post_comment: "postComment",
   swh_delete_comment: "deleteComment",

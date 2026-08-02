@@ -66,3 +66,70 @@ export function loadConfig(): MCPConfig {
 
   return applyEnv({ ...DEFAULT_CONFIG });
 }
+
+// ---- GitHub token (for the issue tools) --------------------------------
+//
+// Optional overall: the Steam tools need nothing from GitHub, so absence is
+// reported per-call by requireGitHubToken rather than crashing the server.
+// Sourced from GITHUB_TOKEN, else a gitignored github_token.txt in mcp/ (raw
+// token, or a `TOKEN=...` line — matching rimsynapse's format).
+export function getGitHubToken(): string {
+  const fromEnv = process.env.GITHUB_TOKEN?.trim();
+  if (fromEnv) return fromEnv;
+
+  const candidates = [
+    path.join(__dirname, "..", "..", "github_token.txt"), // source: server/build -> mcp/
+    path.join(__dirname, "..", "github_token.txt"), // bundle: server -> root
+  ];
+  for (const p of candidates) {
+    if (!fs.existsSync(p)) continue;
+    try {
+      const content = fs.readFileSync(p, "utf-8").trim();
+      const tokenLine = content.split("\n").find((l) => l.startsWith("TOKEN="));
+      const token = tokenLine ? tokenLine.slice("TOKEN=".length).trim() : content;
+      if (token) return token;
+    } catch {
+      /* try next */
+    }
+  }
+  return "";
+}
+
+export function requireGitHubToken(token: string, toolName: string): void {
+  if (!token) {
+    throw new Error(
+      `The '${toolName}' tool needs a GitHub token, and none is configured. ` +
+        `Set GITHUB_TOKEN in the MCP env (see .mcp.json), or put a token in mcp/github_token.txt ` +
+        `(a personal access token with 'repo' scope). The Steam tools work without it.`
+    );
+  }
+}
+
+// ---- Steam item -> GitHub repo map -------------------------------------
+
+export interface RepoRef {
+  owner: string;
+  repo: string;
+  title?: string;
+}
+
+export function loadRepoMap(): Record<string, RepoRef> {
+  const candidates = [
+    path.join(__dirname, "..", "..", "mcp-config", "repo-map.json"),
+    path.join(__dirname, "..", "mcp-config", "repo-map.json"),
+    path.join(__dirname, "..", "..", "..", "mcp-config", "repo-map.json"),
+  ];
+  for (const p of candidates) {
+    if (!fs.existsSync(p)) continue;
+    try {
+      const parsed = JSON.parse(fs.readFileSync(p, "utf-8"));
+      return (parsed && parsed.items) || {};
+    } catch (err) {
+      console.error(
+        `Ignoring unreadable repo-map at ${p}:`,
+        err instanceof Error ? err.message : err
+      );
+    }
+  }
+  return {};
+}

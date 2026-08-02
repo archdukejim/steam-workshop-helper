@@ -1,5 +1,6 @@
 .git/
 .gitignore
+github_token.txt
 server/src/
 server/node_modules/
 *.mcpb

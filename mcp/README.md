@@ -32,12 +32,30 @@ MCP client ──stdio──▶ MCP server (node)  ──HTTP on 127.0.0.1──
 | `swh_open_item` | *(background)* | Open/focus a tab on a mod; works logged in or not. Bootstraps the "no tab open" case |
 | `swh_get_auth` | `getAuth` | Login state: `{ loggedIn, steamId, accountName }` |
 | `swh_get_context` | `getContext` | The item open in the active tab |
+| `swh_review_notifications` | `reviewNotifications` | Recent comments across **all** your items, enriched with comment text |
+| `swh_get_notifications` | `getNotifications` | Raw list of items with new activity (no text) |
 | `swh_list_comments` | `listComments` | `{ fileId, start?, count? }` |
 | `swh_post_comment` | `postComment` | `{ fileId, text }` — owner/login required |
 | `swh_delete_comment` | `deleteComment` | `{ fileId, commentId }` — irreversible |
 | `swh_get_item` | `getItem` | Read title/description (owner) |
 | `swh_update_description` | `updateDescription` | `{ fileId, description }` — replaces whole body |
 | `swh_update_title` | `updateTitle` | `{ fileId, title }` |
+| `swh_repo_for_item` | *(GitHub)* | Resolve a fileId → its GitHub repo (repo-map.json) |
+| `swh_find_issue` | *(GitHub)* | Search a repo's issues for dedup |
+| `swh_create_issue` | *(GitHub)* | Create an issue for a triaged comment |
+
+The `swh_*_issue` / `swh_repo_for_item` tools talk to the GitHub API directly
+(no browser bridge) and need a `GITHUB_TOKEN` (PAT with `repo` scope) via
+`.mcp.json` env or a gitignored `mcp/github_token.txt`. Steam item → repo comes
+from [`mcp-config/repo-map.json`](mcp-config/repo-map.json).
+
+## Comment triage routine
+
+A draft-first routine reviews comments across all your items, classifies them
+(bug / feature_request / qol / ignore), dedupes against existing issues, and —
+after your approval — files issues and replies on Steam as you with the link.
+It's defined in [`../docs/COMMENT-TRIAGE.md`](../docs/COMMENT-TRIAGE.md) and
+scheduled locally per [`../docs/SCHEDULING.md`](../docs/SCHEDULING.md).
 
 See [`../docs/API.md`](../docs/API.md) for argument/return shapes and the BBCode note.
 

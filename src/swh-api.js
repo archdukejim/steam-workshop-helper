@@ -326,6 +326,95 @@
     return { ok: true, total: j.total_count ?? null };
   }
 
+  // ---- comment notifications ---------------------------------------------
+  //
+  // Steam aggregates "someone commented on your stuff" into a Comment
+  // Notifications page. We parse it for which items have new activity, then
+  // (in reviewNotifications) enrich each with the actual latest comments — the
+  // notification page itself carries no comment text.
+
+  const NOTIF_URL = `${ORIGIN}/my/commentnotifications`;
+
+  function parseNotifications(doc) {
+    const num = (s) => {
+      const m = (s || "").match(/\d+/);
+      return m ? parseInt(m[0], 10) : null;
+    };
+    return Array.from(doc.querySelectorAll(".commentnotification")).map((el) => {
+      const a = el.querySelector("a.commentnotification_click_overlay, a[href]");
+      const href = a ? a.getAttribute("href") || "" : "";
+      const idm = href.match(/[?&]id=(\d+)/) || href.match(/filedetails\/(\d+)/);
+      const desc = (el.querySelector(".commentnotification_description")?.textContent || "").trim();
+      return {
+        fileId: idm ? idm[1] : null,
+        title: (el.querySelector(".commentnotification_title")?.textContent || "").trim(),
+        description: desc,
+        newPosts: num(el.querySelector(".commentnotification_newposts")?.textContent),
+        dateText: (el.querySelector(".commentnotification_date")?.textContent || "")
+          .replace(/\s+/g, " ")
+          .trim(),
+        isOwnItem: /your .*workshop item/i.test(desc),
+      };
+    });
+  }
+
+  /**
+   * Raw comment-notifications list (items with new comment activity).
+   * @returns {Promise<{count:number, notifications:Array}>}
+   */
+  async function getNotifications() {
+    const doc = await fetchDoc(NOTIF_URL);
+    const notifications = parseNotifications(doc);
+    return { count: notifications.length, notifications };
+  }
+
+  /**
+   * Comment notifications enriched with the actual latest comments per item —
+   * the "review my recent notifications" digest.
+   * @param {{ownItemsOnly?:boolean, perItem?:number}} args
+   */
+  async function reviewNotifications(args = {}) {
+    const ownOnly = args.ownItemsOnly !== false; // default: only your items
+    const perItem = args.perItem ?? 5;
+    const { notifications } = await getNotifications();
+
+    const targets = notifications.filter((n) => n.fileId && (!ownOnly || n.isOwnItem));
+    const items = [];
+    for (const n of targets) {
+      let latestComments;
+      try {
+        const res = await listComments({ fileId: n.fileId, count: 30 });
+        latestComments = res.comments
+          .slice()
+          .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+          .slice(0, perItem)
+          .map((c) => ({
+            id: c.id,
+            author: c.author,
+            authorId: c.authorId,
+            timestamp: c.timestamp,
+            text: c.text,
+          }));
+      } catch (err) {
+        latestComments = [{ error: String((err && err.message) || err) }];
+      }
+      items.push({
+        fileId: n.fileId,
+        title: n.title,
+        dateText: n.dateText,
+        newPosts: n.newPosts,
+        url: `${ORIGIN}/sharedfiles/filedetails/?id=${n.fileId}`,
+        latestComments,
+      });
+    }
+
+    const skipped = notifications
+      .filter((n) => !n.fileId)
+      .map((n) => ({ title: n.title, dateText: n.dateText, note: n.description }));
+
+    return { itemCount: items.length, items, skipped };
+  }
+
   // ---- title / description (edit-form clone) ------------------------------
 
   function editUrl(meta) {
@@ -472,6 +561,9 @@
     listComments,
     postComment,
     deleteComment,
+    // notifications
+    getNotifications,
+    reviewNotifications,
     // item text
     getItem,
     updateItem,
@@ -486,6 +578,8 @@
         "listComments",
         "postComment",
         "deleteComment",
+        "getNotifications",
+        "reviewNotifications",
         "getItem",
         "updateItem",
         "updateDescription",
