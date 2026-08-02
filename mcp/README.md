@@ -45,9 +45,10 @@ MCP client ──stdio──▶ MCP server (node)  ──HTTP on 127.0.0.1──
 | `swh_create_issue` | *(GitHub)* | Create an issue for a triaged comment |
 
 The `swh_*_issue` / `swh_repo_for_item` tools talk to the GitHub API directly
-(no browser bridge) and need a `GITHUB_TOKEN` (PAT with `repo` scope) via
-`.mcp.json` env or a gitignored `mcp/github_token.txt`. Steam item → repo comes
-from [`mcp-config/repo-map.json`](mcp-config/repo-map.json).
+(no browser bridge). Token resolution, in order: `GITHUB_TOKEN` env →
+gitignored `mcp/github_token.txt` (PAT with `repo` scope) → **your `gh` CLI
+login** (`gh auth token`, reused from the OS keyring — nothing to store). Steam
+item → repo comes from [`mcp-config/repo-map.json`](mcp-config/repo-map.json).
 
 ## Comment triage routine
 

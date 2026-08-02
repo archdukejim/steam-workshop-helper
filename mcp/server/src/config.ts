@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import { execSync } from "child_process";
 
 /**
  * Steam Workshop Helper MCP — configuration.
@@ -92,15 +93,30 @@ export function getGitHubToken(): string {
       /* try next */
     }
   }
+
+  // Last resort: reuse the gh CLI's authenticated token from the OS keyring, so
+  // no plaintext token needs to be stored anywhere. No-op if gh is absent or
+  // not logged in. (env GITHUB_TOKEN / github_token.txt still take precedence.)
+  try {
+    const out = execSync("gh auth token", {
+      encoding: "utf-8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    if (out) return out;
+  } catch {
+    /* gh not installed or not authenticated */
+  }
+
   return "";
 }
 
 export function requireGitHubToken(token: string, toolName: string): void {
   if (!token) {
     throw new Error(
-      `The '${toolName}' tool needs a GitHub token, and none is configured. ` +
-        `Set GITHUB_TOKEN in the MCP env (see .mcp.json), or put a token in mcp/github_token.txt ` +
-        `(a personal access token with 'repo' scope). The Steam tools work without it.`
+      `The '${toolName}' tool needs a GitHub token, and none is available. ` +
+        `Log in with 'gh auth login' (the token is reused from your keyring automatically), ` +
+        `or set GITHUB_TOKEN in the MCP env, or put a PAT with 'repo' scope in mcp/github_token.txt. ` +
+        `The Steam tools work without it.`
     );
   }
 }

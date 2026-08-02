@@ -17,8 +17,9 @@ The routine acts on your live browser session, so at run time:
 1. **Chrome is running** with the Steam Workshop Helper extension (v0.3.0+) loaded.
 2. You are **logged into Steam** in that Chrome.
 3. The MCP server is reachable (registered in your config; it hosts the loopback bridge).
-4. A `GITHUB_TOKEN` (PAT with `repo` scope) is configured for the MCP — set in
-   `.mcp.json` env or `mcp/github_token.txt`. Needed only for the issue steps.
+4. A GitHub token is available for the MCP — from `GITHUB_TOKEN`,
+   `mcp/github_token.txt`, or automatically from your `gh` CLI login
+   (`gh auth token`). Needed only for the issue steps.
 5. `mcp/mcp-config/repo-map.json` maps each workshop item to its GitHub repo.
 
 If Chrome isn't up / not logged in, the Steam tools return a clear error — stop
