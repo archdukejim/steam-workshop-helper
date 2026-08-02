@@ -61,6 +61,11 @@ routine MUST account for this or it will spam duplicate replies:
 - A user comment that archdukejim has **already replied to / addressed** (fixed,
   shipped, backlogged-with-reasons) is **handled** → skip it. Never classify
   archdukejim's own comments as requests.
+- **Author replies often do NOT @mention the user.** Match a reply to a comment
+  by **topic and position** (an archdukejim comment on the same subject, usually
+  right after the user's), not by name. E.g. a "does it work with Empire
+  Refactored?" question is answered by a following archdukejim comment about
+  Empire Refactored compat even though it never names the asker.
 - Maintain persistent state in `mcp/mcp-config/triage-state.json`:
   `{ "handled": { "<commentId>": { "disposition": "...", "issue": "...", "note": "...", "at": "..." } } }`.
   **Skip any comment whose ID is already in `handled`.** Record every comment the
