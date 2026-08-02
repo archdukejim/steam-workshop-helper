@@ -51,12 +51,36 @@ replies, not requests.
 
 ---
 
+## Idempotency — read your own replies, never re-post (critical)
+
+The mod author (**archdukejim**) replies to users **directly on Steam**. The
+routine MUST account for this or it will spam duplicate replies:
+
+- **Read the whole thread, all authors, chronological** — including
+  archdukejim's own comments. Do **not** filter them out.
+- A user comment that archdukejim has **already replied to / addressed** (fixed,
+  shipped, backlogged-with-reasons) is **handled** → skip it. Never classify
+  archdukejim's own comments as requests.
+- Maintain persistent state in `mcp/mcp-config/triage-state.json`:
+  `{ "handled": { "<commentId>": { "disposition": "...", "issue": "...", "note": "...", "at": "..." } } }`.
+  **Skip any comment whose ID is already in `handled`.** Record every comment the
+  routine files, replies to, or decides to skip.
+- **Before posting any reply**, confirm no equivalent reply already exists in the
+  thread (from archdukejim or a prior routine run). If one does, do not post.
+
+This is the guard against the re-posting loop: without it, a run that can't see
+its own past replies re-comments every time.
+
 ## Workflow (draft-first)
 
 ### Phase 1 — gather & classify (read-only)
 1. `swh_review_notifications { ownItemsOnly: true, perItem: 15 }`.
-2. For every comment in every returned item, apply the rubric. Drop `ignore`.
-3. For each actionable comment, resolve its repo:
+2. For each notified item, read the **full comment thread** (`swh_list_comments`)
+   including archdukejim's replies, chronological.
+3. For every user comment: skip it if its ID is in `triage-state.json.handled`,
+   or if archdukejim has already replied to/addressed it. Otherwise apply the
+   rubric. Drop `ignore` (and record ignored IDs as handled to keep reports quiet).
+4. For each actionable comment, resolve its repo:
    `swh_repo_for_item { fileId }`. If `unmapped`, keep it in the report under
    **"needs repo mapping"** and do not attempt to file it.
 
@@ -84,8 +108,14 @@ replies, not requests.
 Approval may be "do all", or a subset ("just the bugs", "skip #3").
 For each approved item:
 - **new** → `swh_create_issue { fileId, title, body, labels }`, take the real
-  `#N`/url, then `swh_post_comment { fileId, text: <new-issue reply> }`.
-- **duplicate** → `swh_post_comment { fileId, text: <duplicate reply> }` only.
+  `#N`/url, then `swh_post_comment { fileId, text: <new-issue reply> }` —
+  **unless archdukejim already replied in-thread**, in which case file the issue
+  but skip the reply.
+- **duplicate** → `swh_post_comment { fileId, text: <duplicate reply> }` only
+  (again, skip if already replied).
+
+After each action, **record the comment ID in `triage-state.json.handled`** with
+its disposition and issue link, so it is never processed again.
 
 Report back what was created and posted, with links.
 
